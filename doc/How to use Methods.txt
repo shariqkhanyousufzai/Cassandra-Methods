@@ -1,0 +1,4 @@
+1. After setting up the cassandra (Go to Read Me File If You Want to setup)
+2. Iclude file Cassandra_Methods.
+3. Check Connection in Cassandra_Conn.php. 
+4. Cassandra_Methods::"function name You Want To Use()".
