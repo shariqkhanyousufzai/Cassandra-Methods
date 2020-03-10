@@ -8,7 +8,7 @@ class Cassandra_Methods
     // CASSSANDRA CONNECTION CLASS START ----------
     // Cassandra_Conn::conn() use this class to execute Statement.
     // CASSSANDRA CONNECTION CLASS END ----------
-    
+
 
     // MIGRATION FROM SQL TO CASSANDRA FUCTION START ----------
     //Use this function to migrate data from MYSQL To Cassandra
@@ -38,15 +38,23 @@ class Cassandra_Methods
     }
     // MIGRATION FROM SQL TO CASSANDRA FUCTION END ----------
 
+
     // SELECT FUCTION START ----------
     //Use this function to select data from Cassandra
     // ONE PARAM : it will select all if you pass one parameter
     // TWO PARAM : it will select specific columns format should be comma seprated.
-    static function select($table_name,$params = NULL){ 
-        if (isset($params)) {
-            $sql = "SELECT ".$params." FROM ".$table_name."";
+    // Three PARAM : it will select With the limit given.
+    //Leave Param Empty if you dont want to use it.
+    static function select($table_name,$columns = NULL,$limit = NULL){ 
+        if (isset($limit) && !empty($limit)) {
+            $default = $limit;
         }else{
-            $sql = "SELECT * FROM ".$table_name."";
+            $default = 5000;
+        }
+        if (isset($columns) && !empty($columns)) {
+            $sql = "SELECT ".$columns." FROM ".$table_name." LIMIT ".$default." ";
+        }else{
+            $sql = "SELECT * FROM ".$table_name." LIMIT ".$default."";
         }
         $statement = new Cassandra\SimpleStatement($sql);
         $result    = Cassandra_Conn::conn()->execute($statement);
@@ -55,23 +63,8 @@ class Cassandra_Methods
     // SELECT FUCTION END ----------
 
 
-    // SELECT FUCTION START ----------
-    //Use this function to select data from Cassandra
-    // ONE PARAM : it will select all if you pass one parameter
-    // TWO PARAM : it will select specific columns format should be comma seprated.
-    // static function select_where($table_name,$params){ 
-    //     if (isset($params)) {
-    //         $sql = "SELECT ".$params." FROM ".$table_name."";
-    //     }else{
-    //         $sql = "SELECT * FROM ".$table_name."";
-    //     }
-    //     $statement = new Cassandra\SimpleStatement($sql);
-    //     $result    = Cassandra_Conn::conn()->execute($statement);
-    //     return $result;
-    // }
-    // SELECT FUCTION END ----------
-
-    // Cassandra_Conn::conn() use this class to execute Statement.
+    // INSERT FUNCTION START --------------
+    // FUNCTION REQUIREMENT : TABLE NAME , TABLE DATA HAVING KEYS AS COLUMNS, AND VALUE AS DATA
     static function insert($table_name,$table_data){
         $typeCastData = json_encode($table_data);
         $convertCols = array(); 
@@ -94,6 +87,42 @@ class Cassandra_Methods
         }
         return FALSE;
     }
+    // INSERT FUNCTION START END--------------
+
+
+    // DELETE FUNCTION START --------------
+    // To DELETE DATA Use This Fuction 
+    // ONE PARAM : table name;
+    // TWO PARAM : if columns define it will delete the specific if not it will delete all.
+    // Three PARAM : You can give the condition for example id=1 and name=alex.
+    static function delete($table_name,$columns = NULL,$condition = NULL){
+        if (isset($condition) || !empty($condition)) {
+        $sql = "DELETE ".$columns." FROM ".$table_name."";
+        }else{
+        $sql = "DELETE ".$columns." FROM ".$table_name." WHERE ".$condition." ";
+        }
+        $statement = new Cassandra\SimpleStatement($sql);
+        $result    = Cassandra_Conn::conn()->execute($statement);
+        return $result;
+    }
+    // DELETE FUNCTION START --------------
+
+
+    // UPDATE FUNCTION START -------------
+    static function update(){
+
+    }
+    // UPDATE FUNCTION START END -----------
+
+    // TRUNCATE FUNCTION START --------------
+    // To Empty Table Use This Fuction 
+    static function truncate(){
+        $sql = "TRUNCATE ".$table_name."";
+        $statement = new Cassandra\SimpleStatement($sql);
+        $result    = Cassandra_Conn::conn()->execute($statement);
+        return $result;
+    }
+    // TRUNCATE FUNCTION START --------------
 
 
 
